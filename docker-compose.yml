@@ -1,0 +1,45 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver2022
+    restart: unless-stopped
+    ports:
+      - "1439:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$${MSSQL_SA_PASSWORD}" -Q "SELECT 1" -C || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  webapi:
+    image: asmonsalves42/sinco-webapi:1.0.0
+    container_name: sinco-webapi
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=SincoTest;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+
+  ui:
+    image: asmonsalves42/sinco-web:1.0.0
+    container_name: sinco-web-test
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: "4000"
+      API_TARGET_URL: "http://host.docker.internal:7041"
+
+volumes:
+  sqlserver_data:
