@@ -12,17 +12,17 @@ La solución corre en una red Docker única (red por defecto de Compose) y usa v
 
 ```mermaid
 flowchart LR
-		U[Usuario / Navegador] -->|http://localhost:4000| UI[sinco-web-test\nUI]
-		U -->|http://localhost:8080| API[sinco-webapi\nWeb API]
-		API -->|TCP 1433 (red interna)| DB[sqlserver2022\nSQL Server 2022]
+    U[Usuario / Navegador] -->|http://localhost:4000| UI[sinco-web-test UI]
+    U -->|http://localhost:8080| API[sinco-webapi Web API]
+    API -->|TCP 1433 red interna| DB[sqlserver2022 SQL Server 2022]
 
-		subgraph Docker Compose Network
-			UI
-			API
-			DB
-		end
+    subgraph Docker Compose Network
+      UI
+      API
+      DB
+    end
 
-		DB --- V[(Volumen persistente\nsqlserver_data)]
+    DB --- V[(Volumen persistente sqlserver_data)]
 ```
 
 ### Servicios
