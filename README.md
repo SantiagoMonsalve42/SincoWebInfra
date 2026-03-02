@@ -127,7 +127,7 @@ Esto evita que la API inicie antes de que SQL acepte conexiones.
 
 ## 7) Migraciones EF
 
-La migración ahora se ejecuta dentro del arranque de la API (no por servicio `migrator` en Compose).
+La migración se ejecuta dentro del arranque de la API.
 
 Recomendación en la API:
 
@@ -135,43 +135,7 @@ Recomendación en la API:
 - Mantener reintentos de conexión para tolerar arranque en frío de SQL.
 
 ---
-
-## 8) Troubleshooting
-
-### Error de login `sa` (18456, State 8)
-
-Síntoma típico en logs de SQL:
-
-- `Login failed for user 'sa'. Reason: Password did not match...`
-
-Causa común:
-
-- Se cambió `MSSQL_SA_PASSWORD` en `.env` después de inicializar el volumen `sqlserver_data`.
-
-Opciones de solución:
-
-1. **Mantener datos existentes**: usar en `.env` la misma contraseña con la que se creó originalmente el volumen.
-2. **Reinicializar desde cero** (borra datos):
-
-```bash
-docker compose down -v
-docker compose up -d
-```
-
-### API no arranca
-
-- Verifica estado de SQL: `docker compose ps`
-- Revisa logs: `docker compose logs -f sqlserver webapi`
-- Confirma connection string de `webapi` apunta a `sqlserver,1433`.
-
-### UI no consume la API esperada
-
-- Hoy está configurada con `API_TARGET_URL=http://host.docker.internal:7041`.
-- Si quieres usar la API de este stack, cambiar a `http://webapi:8080`.
-
----
-
-## 9) Operación diaria
+## 8) Operación diaria
 
 ### Detener servicios
 
@@ -193,7 +157,7 @@ docker compose up -d --force-recreate
 
 ---
 
-## 10) Seguridad y buenas prácticas
+## 9) Seguridad y buenas prácticas
 
 - No subir `.env` con secretos reales al repositorio.
 - Usar una contraseña robusta para `sa` en ambientes compartidos.
